@@ -1,7 +1,6 @@
 <template>
   <div id="app">
-    <el-button>el-button</el-button>
-    <Register msg="Welcome to Book"/>
+    <Register msg="Register to Book"/>
   </div>
 </template>
 
