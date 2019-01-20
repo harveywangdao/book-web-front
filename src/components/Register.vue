@@ -32,7 +32,7 @@ export default {
       rules: {
         account: [
           {required: true, message: 'please input account', trigger: 'blur'},
-          {min: 10, max: 100, message: '10-100 characters', trigger: 'blur'}
+          {min: 2, max: 100, message: '2-100 characters', trigger: 'blur'}
         ],
         password: [
           {required: true, message: 'please input password', trigger: 'blur'},
@@ -45,9 +45,26 @@ export default {
     onSubmit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$message({
-            message: 'register success!',
-            type: 'success'
+          let postData = this.$qs.stringify({
+            email: this.registerForm.account,
+            token: this.registerForm.password
+          });
+
+          this.$axios({
+              method: 'post',
+              url: '/api/v1/user/register',
+              data: postData
+          }).then((res) => {
+              if (res.data && res.data.status) {
+                this.$message({
+                  message: 'register success!',
+                  type: 'success'
+                });
+              } else {
+                this.$message.error('register failure!'+JSON.stringify(res));
+              }
+          }).catch((error) => {
+            this.$message.error('register failure!'+JSON.stringify(error));
           });
         } else {
           this.$message.error('register failure!');
