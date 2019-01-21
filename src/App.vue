@@ -1,17 +1,13 @@
 <template>
   <div id="app">
-    <Register msg="Register to Book"/>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Register from './components/Register.vue'
-
 export default {
   name: 'app',
-  components: {
-    Register
-  }
+  components: {}
 }
 </script>
 
