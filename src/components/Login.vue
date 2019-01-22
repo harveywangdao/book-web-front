@@ -5,7 +5,7 @@
     </div>
     <el-form ref="loginForm" :rules="rules" :model="loginForm" class="loginInfo">
       <el-form-item class="account" prop="account">
-        <el-input v-model="loginForm.account" placeholder="邮箱"></el-input>
+        <el-input v-model="loginForm.account" placeholder="邮箱" spellcheck="false"></el-input>
       </el-form-item>
       <el-form-item class="password" prop="password">
         <el-input type="password" v-model="loginForm.password" placeholder="密码"></el-input>
@@ -13,6 +13,11 @@
       <el-form-item class="submit">
         <el-button type="success" @click="onSubmit('loginForm')">登录</el-button>
       </el-form-item>
+      <div class="needRegister">
+        <router-link to="/register">
+          去注册
+        </router-link>
+      </div>
     </el-form>
   </div>
 </template>
@@ -79,6 +84,10 @@ export default {
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+}
+
 .title {
   margin: 200px 0 0;
   border: 0;
@@ -104,7 +113,7 @@ export default {
 }
 
 .submit {
-  margin: 30px 0 0;
+  margin: 30px 0 10px;
   border: 0;
   padding: 0;
 }
