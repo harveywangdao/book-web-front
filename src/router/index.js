@@ -18,6 +18,23 @@ export default new Router({
             component: resolve => require(['../components/Login.vue'], resolve)
         },
         {
+            path: '/home',
+            component: resolve => require(['../components/Home.vue'], resolve),
+            meta: { title: 'MainPage' },
+            children:[
+                {
+                    path: '/articlelist',
+                    component: resolve => require(['../components/ArticleList.vue'], resolve),
+                    meta: { title: 'Article List' }
+                },
+                {
+                    path: '/article',
+                    component: resolve => require(['../components/Article.vue'], resolve),
+                    meta: { title: 'Article' }
+                }
+            ]
+        },
+        {
             path: '*',
             redirect: '/404'
         }
