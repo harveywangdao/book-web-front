@@ -1,185 +1,149 @@
 <template>
     <div class="header">
-        <!-- 折叠按钮 -->
-        <div class="collapse-btn" @click="collapseChage">
-            <i class="el-icon-menu"></i>
+        <div class="logo">BOOK</div>
+        <div v-if="!isLogined" class="loginOrReg">
+            <router-link to="/login" class="login">
+                登录
+            </router-link>
+            <router-link to="/register" class="register">
+                注册
+            </router-link>
         </div>
-        <div class="logo">后台管理系统</div>
-        <div class="header-right">
-            <div class="header-user-con">
-                <!-- 全屏显示 -->
-                <div class="btn-fullscreen" @click="handleFullScreen">
-                    <el-tooltip effect="dark" :content="fullscreen?`取消全屏`:`全屏`" placement="bottom">
-                        <i class="el-icon-rank"></i>
-                    </el-tooltip>
-                </div>
-                <!-- 消息中心 -->
-                <div class="btn-bell">
-                    <el-tooltip effect="dark" :content="message?`有${message}条未读消息`:`消息中心`" placement="bottom">
-                        <router-link to="/tabs">
-                            <i class="el-icon-bell"></i>
-                        </router-link>
-                    </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
-                </div>
-                <!-- 用户头像 -->
-                <div class="user-avator"><img src="../../assets/img/img.jpg"></div>
-                <!-- 用户名下拉菜单 -->
-                <el-dropdown class="user-name" trigger="click" @command="handleCommand">
-                    <span class="el-dropdown-link">
-                        {{username}} <i class="el-icon-caret-bottom"></i>
-                    </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <a href="http://blog.gdfengshuo.com/about/" target="_blank">
-                            <el-dropdown-item>关于作者</el-dropdown-item>
-                        </a>
-                        <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                            <el-dropdown-item>项目仓库</el-dropdown-item>
-                        </a>
-                        <el-dropdown-item divided  command="loginout">退出登录</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </div>
+        <div v-else class="unlogin">
+            <span style="cursor:pointer" @click="unlogin()">退出登录</span>
         </div>
+
+        <router-link to="/addArticle" class="addArticle">
+            写文章
+        </router-link>
     </div>
 </template>
+
 <script>
-    import bus from '../common/bus';
     export default {
-        data() {
+        name: 'Header',
+        components: {},
+        data: function () {
             return {
-                collapse: false,
-                fullscreen: false,
-                name: 'linxin',
-                message: 2
+                isLogined: false
             }
         },
-        computed:{
-            username(){
-                let username = localStorage.getItem('ms_username');
-                return username ? username : this.name;
-            }
+        created: function() {
+            this.getLoginStatus();
         },
-        methods:{
-            // 用户名下拉菜单选择事件
-            handleCommand(command) {
-                if(command == 'loginout'){
-                    localStorage.removeItem('ms_username')
-                    this.$router.push('/login');
-                }
-            },
-            // 侧边栏折叠
-            collapseChage(){
-                this.collapse = !this.collapse;
-                bus.$emit('collapse', this.collapse);
-            },
-            // 全屏事件
-            handleFullScreen(){
-                let element = document.documentElement;
-                if (this.fullscreen) {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitCancelFullScreen) {
-                        document.webkitCancelFullScreen();
-                    } else if (document.mozCancelFullScreen) {
-                        document.mozCancelFullScreen();
-                    } else if (document.msExitFullscreen) {
-                        document.msExitFullscreen();
+        methods: {
+            getLoginStatus: function (){
+                this.$axios({
+                    method: 'get',
+                    url: '/api/v1/user/isLogined'
+                }).then((res) => {
+                    if (res.data && res.data.status) {
+                        this.isLogined = true;
+                    }else{
+                        this.isLogined = false;
                     }
-                } else {
-                    if (element.requestFullscreen) {
-                        element.requestFullscreen();
-                    } else if (element.webkitRequestFullScreen) {
-                        element.webkitRequestFullScreen();
-                    } else if (element.mozRequestFullScreen) {
-                        element.mozRequestFullScreen();
-                    } else if (element.msRequestFullscreen) {
-                        // IE11
-                        element.msRequestFullscreen();
+                }).catch((error) => {
+                    this.$message.error('isLogined failure!'+JSON.stringify(error));
+                });
+            },
+            unlogin: function (){
+                this.$axios({
+                    method: 'post',
+                    url: '/api/v1/user/logout'
+                }).then((res) => {
+                    if (res.data && res.data.status) {
+                      this.$message({
+                        message: 'logout success!',
+                        type: 'success'
+                      });
+                    } else {
+                      this.$message.error('logout failure!'+JSON.stringify(res));
                     }
-                }
-                this.fullscreen = !this.fullscreen;
-            }
-        },
-        mounted(){
-            if(document.body.clientWidth < 1500){
-                this.collapseChage();
+
+                    this.getLoginStatus();
+                }).catch((error) => {
+                    this.$message.error('logout failure!'+JSON.stringify(error));
+                });
             }
         }
     }
 </script>
+
 <style scoped>
-    .header {
-        position: relative;
-        box-sizing: border-box;
-        width: 100%;
-        height: 70px;
-        font-size: 22px;
-        color: #fff;
-    }
-    .collapse-btn{
-        float: left;
-        padding: 0 21px;
-        cursor: pointer;
-        line-height: 70px;
-    }
-    .header .logo{
-        float: left;
-        width:250px;
-        line-height: 70px;
-    }
-    .header-right{
-        float: right;
-        padding-right: 50px;
-    }
-    .header-user-con{
-        display: flex;
-        height: 70px;
-        align-items: center;
-    }
-    .btn-fullscreen{
-        transform: rotate(45deg);
-        margin-right: 5px;
-        font-size: 24px;
-    }
-    .btn-bell, .btn-fullscreen{
-        position: relative;
-        width: 30px;
-        height: 30px;
-        text-align: center;
-        border-radius: 15px;
-        cursor: pointer;
-    }
-    .btn-bell-badge{
-        position: absolute;
-        right: 0;
-        top: -2px;
-        width: 8px;
-        height: 8px;
-        border-radius: 4px;
-        background: #f56c6c;
-        color: #fff;
-    }
-    .btn-bell .el-icon-bell{
-        color: #fff;
-    }
-    .user-name{
-        margin-left: 10px;
-    }
-    .user-avator{
-        margin-left: 20px;
-    }
-    .user-avator img{
-        display: block;
-        width:40px;
-        height:40px;
-        border-radius: 50%;
-    }
-    .el-dropdown-link{
-        color: #fff;
-        cursor: pointer;
-    }
-    .el-dropdown-menu__item{
-        text-align: center;
-    }
+a {
+    text-decoration: none;
+}
+
+.router-link-active {
+    text-decoration: none;
+}
+
+.header-old {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 70px;
+    font-size: 22px;
+    color: white;
+}
+
+.header {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 70px;
+    font-size: 22px;
+    color: white;
+    background-color: #242f42;
+}
+
+.logo {
+    float: left;
+    width: 250px;
+    line-height: 70px;
+}
+
+.addArticle {
+    float: right;
+    width: 50px;
+    line-height: 70px;
+    font-size: 16px;
+    color: white;
+}
+
+.unlogin {
+    float: right;
+    width: 250px;
+    line-height: 70px;
+    font-size: 16px;
+}
+
+.loginOrReg {
+    float: right;
+    line-height: 70px;
+    padding-right: 50px;
+    padding-left: 50px;
+    font-size: 16px;
+}
+
+.login {
+    float: left;
+    width: 40px;
+    line-height: 70px;
+    color: white;
+    margin: 0 20px 0;
+}
+
+.register {
+    float: right;
+    width: 40px;
+    line-height: 70px;
+    color: white;
+    margin: 0 20px 0;
+}
+
 </style>

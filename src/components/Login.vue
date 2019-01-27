@@ -67,6 +67,7 @@ export default {
                   message: 'login success!',
                   type: 'success'
                 });
+                this.$router.push('/articlelist');
               } else {
                 this.$message.error('login failure!'+JSON.stringify(res));
               }

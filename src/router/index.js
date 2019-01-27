@@ -7,7 +7,7 @@ export default new Router({
     routes: [
         {
             path: '/',
-            redirect: '/login'
+            redirect: '/articlelist'
         },
         {
             path: '/register',
@@ -31,6 +31,11 @@ export default new Router({
                     path: '/article',
                     component: resolve => require(['../components/Article.vue'], resolve),
                     meta: { title: 'Article' }
+                },
+                {
+                    path: '/addArticle',
+                    component: resolve => require(['../components/AddArticle.vue'], resolve),
+                    meta: { title: 'AddArticle' }
                 }
             ]
         },
